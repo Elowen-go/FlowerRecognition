@@ -1,0 +1,13 @@
+BAIDU_API_KEY = "你的百度AI API Key"
+BAIDU_SECRET_KEY = "你的百度AI Secret Key"
+
+HUALVYOU_APP_CODE = "你的花伴侣AppCode"
+HUALVYOU_APP_KEY = "你的花伴侣AppKey"
+HUALVYOU_APP_SECRET = "你的花伴侣AppSecret"
+
+BAIDU_TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token"
+BAIDU_PLANT_URL = "https://aip.baidubce.com/rest/2.0/image-classify/v1/plant"
+
+HUALVYOU_BASE_URL = "https://plantgw.nongbangzhu.cn"
+HUALVYOU_RECOGNIZE_URL = "https://plantgw.nongbangzhu.cn/plant/recognize2"
+HUALVYOU_INFO_URL = "https://plantgw.nongbangzhu.cn/plant/info"

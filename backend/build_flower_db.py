@@ -1,0 +1,753 @@
+import json
+import os
+
+BASE_DIR = os.path.dirname(__file__)
+CAT_TO_NAME_PATH = os.path.join(BASE_DIR, "cat_to_name.json")
+OUTPUT_PATH = os.path.join(BASE_DIR, "flower_info.json")
+
+known_info = {
+    "粉报春": {
+        "latin_name": "Primula farinosa",
+        "family": "报春花科",
+        "genus": "报春花属",
+        "flower_language": "初恋、希望、不悔",
+        "basic_intro": "粉报春是报春花科报春花属的多年生草本植物，原产于欧洲和亚洲的温带地区。叶片矩圆状倒卵形，花葶稍纤细，伞形花序顶生，花冠淡紫红色。喜凉爽、湿润的环境，常用于园林绿化和盆栽观赏。"
+    },
+    "硬叶兜兰": {
+        "latin_name": "Paphiopedilum micranthum",
+        "family": "兰科",
+        "genus": "兜兰属",
+        "flower_language": "高贵、优雅",
+        "basic_intro": "硬叶兜兰是兰科兜兰属的多年生草本植物，又名银兜、玉女兰，是中国特有的珍稀濒危兰花物种。叶片硬革质，花大而美丽，花瓣呈粉红色或白色，唇瓣呈兜状，具有极高的观赏价值。"
+    },
+    "风铃草": {
+        "latin_name": "Campanula medium",
+        "family": "桔梗科",
+        "genus": "风铃草属",
+        "flower_language": "感谢、感恩、温柔的爱",
+        "basic_intro": "风铃草是桔梗科风铃草属的二年生草本植物，原产南欧。因其花形似小铃铛而得名，花冠钟状，花色有白、蓝、紫及淡桃红等。喜阳光充足、冷凉干燥的环境，是著名的庭园观赏植物。"
+    },
+    "香豌豆": {
+        "latin_name": "Lathyrus odoratus",
+        "family": "豆科",
+        "genus": "山黧豆属",
+        "flower_language": "喜悦、离别、甜蜜的回忆",
+        "basic_intro": "香豌豆是豆科山黧豆属的一年生草本植物，原产于意大利西西里岛。花姿优雅，色彩艳丽，芳香馥郁，是冬春优良的切花材料。茎攀缘，多分枝，花下垂，极香，有白、粉、红紫、蓝等多种颜色。"
+    },
+    "金盏菊": {
+        "latin_name": "Calendula officinalis",
+        "family": "菊科",
+        "genus": "金盏花属",
+        "flower_language": "高洁、嫉妒、惜别",
+        "basic_intro": "金盏菊是菊科金盏花属的一年生草本植物，又名金盏花。花序可入药，具有清热平喘、消炎退肿等功效。花色以黄、橙黄为主，早春园林中常见的草本花卉，也可净化空气。"
+    },
+    "卷丹": {
+        "latin_name": "Lilium lancifolium",
+        "family": "百合科",
+        "genus": "百合属",
+        "flower_language": "高贵、百年好合",
+        "basic_intro": "卷丹是百合科百合属的多年生草本植物，因其花瓣向外翻卷而得名。花橙红色，有紫黑色斑点，花姿奇特，摇曳多姿。鳞茎富含淀粉，可供食用和药用，是重要的观赏花卉和经济作物。"
+    },
+    "蝴蝶兰": {
+        "latin_name": "Phalaenopsis aphrodite",
+        "family": "兰科",
+        "genus": "蝴蝶兰属",
+        "flower_language": "幸福、纯洁、高贵",
+        "basic_intro": "蝴蝶兰是兰科蝴蝶兰属的多年生草本植物，素有'兰花皇后'的美称。花姿如蝴蝶飞舞，花色丰富，常见白色、粉色、紫色等品种。原产于热带和亚热带地区，是高档室内盆栽和节日馈赠佳品。"
+    },
+    "鹤望兰": {
+        "latin_name": "Strelitzia reginae",
+        "family": "旅人蕉科",
+        "genus": "鹤望兰属",
+        "flower_language": "幸福、吉祥、自由、长寿",
+        "basic_intro": "鹤望兰是旅人蕉科鹤望兰属的多年生草本植物，又名天堂鸟。花形似仙鹤翘首远望，橙黄色花萼配以蓝色花瓣，极为艳丽。原产南非，是高档切花材料，象征着幸福与吉祥。"
+    },
+    "乌头": {
+        "latin_name": "Aconitum carmichaelii",
+        "family": "毛茛科",
+        "genus": "乌头属",
+        "flower_language": "恶意、复仇",
+        "basic_intro": "乌头是毛茛科乌头属的多年生草本植物，又名草乌。花蓝紫色，盔状，具有较高的药用价值，但全株有毒。分布于中国大部分地区，生于山地草坡或灌木丛中。"
+    },
+    "蓝刺头": {
+        "latin_name": "Echinops sphaerocephalus",
+        "family": "菊科",
+        "genus": "蓝刺头属",
+        "flower_language": "敏锐、严谨",
+        "basic_intro": "蓝刺头是菊科蓝刺头属的多年生草本花卉，因其花像蓝紫色的刺球而得名。耐干旱、耐瘠薄、耐寒，喜凉爽气候。可做鲜切花和干花，也可在园林绿化中栽植，同时具有药用价值。"
+    },
+    "金鱼草": {
+        "latin_name": "Antirrhinum majus",
+        "family": "车前科",
+        "genus": "金鱼草属",
+        "flower_language": "繁荣昌盛、有金有余",
+        "basic_intro": "金鱼草是车前科金鱼草属的多年生草本植物，外形像金鱼而得名。花色丰富，有白、淡红、深红、肉色、浅黄、橙黄等色。原产地中海沿岸，是常见的庭园花卉，全草可入药。"
+    },
+    "款冬": {
+        "latin_name": "Tussilago farfara",
+        "family": "菊科",
+        "genus": "款冬属",
+        "flower_language": "公正、正义",
+        "basic_intro": "款冬是菊科款冬属的多年生草本植物，花蕾入药称款冬花，具润肺止咳功效。早春花叶抽出数个花葶，头状花序单生顶端，花冠黄色。分布于中国各地，生于河边、山谷等潮湿处。"
+    },
+    "帝王海神花": {
+        "latin_name": "Protea cynaroides",
+        "family": "山龙眼科",
+        "genus": "海神花属",
+        "flower_language": "胜利、圆满、高贵",
+        "basic_intro": "帝王海神花是山龙眼科海神花属的灌木植物，又名帝王花，是南非的国花。花球直径巨大，花冠绚丽夺目，被誉为'花中之王'。具有极强的耐旱性，是高档切花和干花材料。"
+    },
+    "矛蓟": {
+        "latin_name": "Cirsium vulgare",
+        "family": "菊科",
+        "genus": "蓟属",
+        "flower_language": "严谨、独立",
+        "basic_intro": "矛蓟是菊科蓟属的多年生草本植物，茎叶有刺，花为紫红色头状花序。耐旱耐寒，适应性强，常见于荒野、路旁。具有药用价值，同时也是良好的蜜源植物。"
+    },
+    "黄鸢尾": {
+        "latin_name": "Iris pseudacorus",
+        "family": "鸢尾科",
+        "genus": "鸢尾属",
+        "flower_language": "热情、适应力强",
+        "basic_intro": "黄鸢尾是鸢尾科鸢尾属的多年生草本植物，花色鲜黄，叶片似剑。喜生于水边或湿地，是优良的水边绿化植物。原产欧洲，在中国各地广泛栽培，具有较高的观赏价值。"
+    },
+    "金莲花": {
+        "latin_name": "Trollius chinensis",
+        "family": "毛茛科",
+        "genus": "金莲花属",
+        "flower_language": "清醒、智慧",
+        "basic_intro": "金莲花是毛茛科金莲花属的多年生草本植物，花金黄灿烂，形似莲花。分布于中国北方高山草甸，喜凉爽湿润气候。花可入药，具有清热解毒的功效，也可制作花草茶。"
+    },
+    "紫锥花": {
+        "latin_name": "Echinacea purpurea",
+        "family": "菊科",
+        "genus": "紫锥花属",
+        "flower_language": "健康、活力、增强免疫力",
+        "basic_intro": "紫锥花是菊科紫锥花属的多年生草本植物，又名松果菊。花大色艳，紫红色花瓣向外展开，中心呈锥形。原产北美，是著名的药用植物，可增强人体免疫力，也是优良的观赏花卉。"
+    },
+    "秘鲁百合": {
+        "latin_name": "Alstroemeria aurea",
+        "family": "六出花科",
+        "genus": "六出花属",
+        "flower_language": "友谊、爱的牵挂",
+        "basic_intro": "秘鲁百合是六出花科六出花属的多年生草本植物，又名六出花。花色丰富，有黄、橙、红、粉、白等色，花瓣上有独特的斑纹。原产南美洲，是优良的切花材料和盆栽花卉。"
+    },
+    "桔梗": {
+        "latin_name": "Platycodon grandiflorus",
+        "family": "桔梗科",
+        "genus": "桔梗属",
+        "flower_language": "永恒的爱、无悔",
+        "basic_intro": "桔梗是桔梗科桔梗属的多年生草本植物，花蓝紫色，钟形，美丽典雅。根可入药，具有宣肺祛痰的功效。分布于东亚地区，既是著名的药用植物，也是观赏价值极高的花卉。"
+    },
+    "马蹄莲": {
+        "latin_name": "Zantedeschia aethiopica",
+        "family": "天南星科",
+        "genus": "马蹄莲属",
+        "flower_language": "纯洁、优雅、高贵",
+        "basic_intro": "马蹄莲是天南星科马蹄莲属的多年生草本植物，佛焰苞白色似马蹄而得名。叶片翠绿，花茎挺拔，花形简约优雅。原产非洲南部，是高档切花和盆栽观赏植物。"
+    },
+    "火百合": {
+        "latin_name": "Lilium bulbiferum",
+        "family": "百合科",
+        "genus": "百合属",
+        "flower_language": "热情、奔放",
+        "basic_intro": "火百合是百合科百合属的多年生草本植物，花色火红或橙红，花瓣向上翻卷，犹如燃烧的火焰。喜阳光充足、排水良好的环境，是优良的观赏花卉和切花材料。"
+    },
+    "针垫花": {
+        "latin_name": "Leucospermum cordifolium",
+        "family": "山龙眼科",
+        "genus": "针垫花属",
+        "flower_language": "坚韧、勇敢",
+        "basic_intro": "针垫花是山龙眼科针垫花属的灌木植物，原产南非。花朵由众多细小花蕊组成，呈针垫状，色彩鲜艳夺目，有红、橙、黄等色。是独特的切花素材，耐旱性强。"
+    },
+    "贝母": {
+        "latin_name": "Fritillaria thunbergii",
+        "family": "百合科",
+        "genus": "贝母属",
+        "flower_language": "谦虚、含蓄",
+        "basic_intro": "贝母是百合科贝母属的多年生草本植物，花钟形下垂，色彩斑斓。鳞茎是名贵中药材，具有清热润肺、化痰止咳的功效。分布于中国和日本，是重要的药用植物。"
+    },
+    "红姜花": {
+        "latin_name": "Alpinia purpurata",
+        "family": "姜科",
+        "genus": "山姜属",
+        "flower_language": "热情、富贵",
+        "basic_intro": "红姜花是姜科山姜属的多年生草本植物，花穗鲜红艳丽，花期长久。原产东南亚热带地区，喜高温多湿环境。是热带园林中重要的观赏植物，也可作切花使用。"
+    },
+    "葡萄风信子": {
+        "latin_name": "Muscari botryoides",
+        "family": "风信子科",
+        "genus": "葡萄风信子属",
+        "flower_language": "感伤、忧郁、思念",
+        "basic_intro": "葡萄风信子是风信子科葡萄风信子属的多年生球根花卉，花形似一串串小葡萄而得名。花色以蓝色为主，也有白色品种。早春开花，是优良的花坛镶边和地被植物。"
+    },
+    "虞美人": {
+        "latin_name": "Papaver rhoeas",
+        "family": "罂粟科",
+        "genus": "罂粟属",
+        "flower_language": "安慰、遗忘、休息",
+        "basic_intro": "虞美人是一年生草本植物，花瓣薄如蝉翼，色彩艳丽，有红、粉、白、橙等色。花姿轻盈柔美，微风拂过如翩翩起舞。原产欧洲，是著名的观赏花卉，全草可入药。"
+    },
+    "藏红花": {
+        "latin_name": "Crocus sativus",
+        "family": "鸢尾科",
+        "genus": "番红花属",
+        "flower_language": "喜悦、珍贵",
+        "basic_intro": "藏红花是鸢尾科番红花属的多年生球根花卉，花柱和柱头是名贵中药材和香料。紫蓝色的花朵优雅美丽，秋季开花。原产地中海地区，具有极高的经济和药用价值。"
+    },
+    "无茎龙胆": {
+        "latin_name": "Gentiana acaulis",
+        "family": "龙胆科",
+        "genus": "龙胆属",
+        "flower_language": "坚韧、忧伤",
+        "basic_intro": "无茎龙胆是龙胆科龙胆属的多年生草本植物，花大而艳丽，呈深蓝色或蓝紫色，钟形。植株低矮，几乎无茎，花朵紧贴地面开放。原产欧洲高山地区，是高山岩石园的珍品。"
+    },
+    "洋蓟": {
+        "latin_name": "Cynara cardunculus",
+        "family": "菊科",
+        "genus": "菜蓟属",
+        "flower_language": "优雅、高贵",
+        "basic_intro": "洋蓟是菊科菜蓟属的多年生草本植物，花蕾可食用，是高档蔬菜。植株高大挺拔，叶片银绿色，花头紫红色，极具观赏价值。原产地中海地区，营养丰富，有益肝健脾的功效。"
+    },
+    "须苞石竹": {
+        "latin_name": "Dianthus barbatus",
+        "family": "石竹科",
+        "genus": "石竹属",
+        "flower_language": "热情、永远美丽",
+        "basic_intro": "须苞石竹是石竹科石竹属的多年生草本植物，又名美国石竹。花小而密，组成伞形花序，花色丰富，有红、粉、白、紫等色，常有斑纹或镶边。是优良的花坛和切花材料。"
+    },
+    "康乃馨": {
+        "latin_name": "Dianthus caryophyllus",
+        "family": "石竹科",
+        "genus": "石竹属",
+        "flower_language": "母爱、温馨、祝福",
+        "basic_intro": "康乃馨是石竹科石竹属的多年生草本植物，是世界四大切花之一。花瓣多层叠皱，花色丰富多样，有红、粉、白、黄、橙等色。原产地中海地区，是母亲节的象征花卉。"
+    },
+    "福禄考": {
+        "latin_name": "Phlox drummondii",
+        "family": "花荵科",
+        "genus": "福禄考属",
+        "flower_language": "一致、同意、甜蜜的梦",
+        "basic_intro": "福禄考是花荵科福禄考属的一年生草本植物，又名小天蓝绣球。花密集组成伞房花序，花色丰富，有红、粉、白、紫等色。原产北美，是优良的花坛和盆栽花卉。"
+    },
+    "黑种草": {
+        "latin_name": "Nigella damascena",
+        "family": "毛茛科",
+        "genus": "黑种草属",
+        "flower_language": "梦幻、无尽的思念",
+        "basic_intro": "黑种草是毛茛科黑种草属的一年生草本植物，花蓝色或白色， surrounded by细碎的苞叶，形成独特的观赏效果。果实为膨胀的蓇葖果，是优良的切花和干花素材。"
+    },
+    "墨西哥紫菀": {
+        "latin_name": "Cosmos bipinnatus",
+        "family": "菊科",
+        "genus": "秋英属",
+        "flower_language": "和谐、美好、少女的心",
+        "basic_intro": "墨西哥紫菀是菊科秋英属的一年生草本植物，又名波斯菊、格桑花。花大色艳，有粉、红、白、紫等色，花瓣8枚，轻盈飘逸。原产墨西哥，是常见的园林观赏花卉。"
+    },
+    "高山蓝刺头": {
+        "latin_name": "Echinops ritro",
+        "family": "菊科",
+        "genus": "蓝刺头属",
+        "flower_language": "严谨、敏锐",
+        "basic_intro": "高山蓝刺头是菊科蓝刺头属的多年生草本植物，球形的蓝色花序独特醒目。耐寒耐旱，适应性强，适合岩石园和花境种植。花期夏季，是优良的切花和干花材料。"
+    },
+    "卡特兰": {
+        "latin_name": "Cattleya labiata",
+        "family": "兰科",
+        "genus": "卡特兰属",
+        "flower_language": "高贵、美丽、魅力",
+        "basic_intro": "卡特兰是兰科卡特兰属的附生草本植物，被誉为'兰花之王'。花大而华丽，色彩丰富，芳香浓郁。原产中南美洲热带地区，是高档盆栽兰花和切花，极具收藏价值。"
+    },
+    "海角樱草": {
+        "latin_name": "Streptocarpus rexii",
+        "family": "苦苣苔科",
+        "genus": "海角樱草属",
+        "flower_language": "优雅、迷人",
+        "basic_intro": "海角樱草是苦苣苔科海角樱草属的多年生草本植物，花色丰富，有蓝、紫、粉、白等色，花形似喇叭。原产南非，喜温暖湿润的半阴环境，是优良的室内观花植物。"
+    },
+    "大星芹": {
+        "latin_name": "Astrantia major",
+        "family": "伞形科",
+        "genus": "大星芹属",
+        "flower_language": "高贵、典雅、星辰",
+        "basic_intro": "大星芹是伞形科大星芹属的多年生草本植物，头状花序 surrounded by 星状苞片，形似星星。花色有粉红、红、白等，花期夏季。原产欧洲，是花境和切花的优良材料。"
+    },
+    "暹罗郁金香": {
+        "latin_name": "Curcuma alismatifolia",
+        "family": "姜科",
+        "genus": "姜黄属",
+        "flower_language": "热情、富贵",
+        "basic_intro": "暹罗郁金香是姜科姜黄属的多年生草本植物，又名泰国郁金香。花序顶生，苞片粉紫色，形似郁金香。原产泰国等东南亚地区，是热带观赏花卉和切花材料。"
+    },
+    "圣诞玫瑰": {
+        "latin_name": "Helleborus niger",
+        "family": "毛茛科",
+        "genus": "铁筷子属",
+        "flower_language": "安慰、抚慰",
+        "basic_intro": "圣诞玫瑰是毛茛科铁筷子属的多年生常绿草本植物，冬季至早春开花。花白色或粉红色，有时带绿色调，花瓣状萼片美丽持久。原产欧洲，是冬季花园中的亮点。"
+    },
+    "巴氏雏菊": {
+        "latin_name": "Bellis perennis",
+        "family": "菊科",
+        "genus": "雏菊属",
+        "flower_language": "天真、纯情、深藏在心底的爱",
+        "basic_intro": "巴氏雏菊是菊科雏菊属的多年生草本植物，植株低矮，花小巧可爱。舌状花白色或粉红色，管状花黄色。早春至初夏开花，是优良的地被植物和花坛边缘材料。"
+    },
+    "黄水仙": {
+        "latin_name": "Narcissus pseudonarcissus",
+        "family": "石蒜科",
+        "genus": "水仙属",
+        "flower_language": "自尊、自信、尊敬",
+        "basic_intro": "黄水仙是石蒜科水仙属的多年生球根花卉，花鲜黄色，副冠喇叭形。早春开花，是英国威尔士的国花。原产欧洲，是著名的球根花卉和切花，象征着春天和希望。"
+    },
+    "剑兰": {
+        "latin_name": "Gladiolus gandavensis",
+        "family": "鸢尾科",
+        "genus": "唐菖蒲属",
+        "flower_language": "用心、坚贞、步步高升",
+        "basic_intro": "剑兰是鸢尾科唐菖蒲属的多年生球根花卉，又名唐菖蒲。花茎挺拔，穗状花序，花色极其丰富，是世界四大切花之一。原产非洲热带和地中海地区，是夏季切花的主打品种。"
+    },
+    "一品红": {
+        "latin_name": "Euphorbia pulcherrima",
+        "family": "大戟科",
+        "genus": "大戟属",
+        "flower_language": "祝福、喜庆、平安",
+        "basic_intro": "一品红是大戟科大戟属的灌木植物，圣诞节期间开花的代表花卉。顶部的红色苞片鲜艳夺目，真正的花小而黄色。原产墨西哥，是重要的节日盆栽观赏植物。"
+    },
+    "蓝眼菊": {
+        "latin_name": "Osteospermum ecklonis",
+        "family": "菊科",
+        "genus": "蓝眼菊属",
+        "flower_language": "信任、忠诚",
+        "basic_intro": "蓝眼菊是菊科蓝眼菊属的多年生草本或亚灌木植物，花心呈独特的蓝色或紫色，周围舌状花有白、粉、紫等色。原产南非，喜阳光充足，是优良的花坛和盆栽花卉。"
+    },
+    "桂竹香": {
+        "latin_name": "Erysimum cheiri",
+        "family": "十字花科",
+        "genus": "糖芥属",
+        "flower_language": "忠诚、坚贞",
+        "basic_intro": "桂竹香是十字花科糖芥属的多年生草本植物，花色以黄、橙黄为主，也有红褐、紫色品种。花有芳香，春季开花。原产欧洲南部，是优良的花坛和岩石园植物。"
+    },
+    "万寿菊": {
+        "latin_name": "Tagetes erecta",
+        "family": "菊科",
+        "genus": "万寿菊属",
+        "flower_language": "健康、长寿、友谊",
+        "basic_intro": "万寿菊是菊科万寿菊属的一年生草本植物，花色以黄、橙为主，花大色艳。叶片有特殊气味。原产墨西哥，是常见的庭园花卉，具有药用和食用价值，也是重要的色素提取原料。"
+    },
+    "毛茛": {
+        "latin_name": "Ranunculus asiaticus",
+        "family": "毛茛科",
+        "genus": "毛茛属",
+        "flower_language": "魅力、高贵、受欢迎",
+        "basic_intro": "毛茛是毛茛科毛茛属的多年生球根花卉，花形似牡丹，花瓣多层，色彩丰富。花色有红、粉、白、黄、橙等。原产中东地区，是高档切花和盆栽花卉。"
+    },
+    "大滨菊": {
+        "latin_name": "Leucanthemum maximum",
+        "family": "菊科",
+        "genus": "大滨菊属",
+        "flower_language": "开朗、活泼、真诚",
+        "basic_intro": "大滨菊是菊科大滨菊属的多年生草本植物，花大洁白，花心黄色，形似放大的雏菊。花期夏季，株型挺拔。原产欧洲，是花境和切花的好材料。"
+    },
+    "蒲公英": {
+        "latin_name": "Taraxacum mongolicum",
+        "family": "菊科",
+        "genus": "蒲公英属",
+        "flower_language": "自由、无拘无束",
+        "basic_intro": "蒲公英是菊科蒲公英属的多年生草本植物，花黄色，果实为白色冠毛球。全草可入药，具有清热解毒、消肿散结的功效。分布广泛，是常见的野生植物和药食同源植物。"
+    },
+    "矮牵牛": {
+        "latin_name": "Petunia hybrida",
+        "family": "茄科",
+        "genus": "碧冬茄属",
+        "flower_language": "安心、温馨、有你我就觉得温馨",
+        "basic_intro": "矮牵牛是茄科碧冬茄属的一年生或多年生草本植物，花冠漏斗形，花色极为丰富，有红、粉、紫、白、蓝等色及各种斑纹。原产南美洲，是全世界最流行的花坛和垂吊花卉之一。"
+    },
+    "三色堇": {
+        "latin_name": "Viola tricolor",
+        "family": "堇菜科",
+        "genus": "堇菜属",
+        "flower_language": "思念、爱的告白",
+        "basic_intro": "三色堇是堇菜科堇菜属的多年生草本植物，通常作二年生栽培。花有紫、白、黄三色，故名三色堇，花瓣上有独特的鬼脸斑纹。原产欧洲，是早春花坛的重要花卉。"
+    },
+    "报春花": {
+        "latin_name": "Primula malacoides",
+        "family": "报春花科",
+        "genus": "报春花属",
+        "flower_language": "初恋、希望",
+        "basic_intro": "报春花是报春花科报春花属的多年生草本植物，早春开花，是春天的信使。花色丰富，有粉红、白、紫红等色，花葶抽出，伞形花序。喜凉爽湿润，是重要的盆花和花坛植物。"
+    },
+    "向日葵": {
+        "latin_name": "Helianthus annuus",
+        "family": "菊科",
+        "genus": "向日葵属",
+        "flower_language": "忠诚、沉默的爱、阳光",
+        "basic_intro": "向日葵是菊科向日葵属的一年生高大草本植物，头状花序硕大，花盘随太阳转动。种子可榨油，是重要的油料作物。原产北美，广泛栽培于世界各地，象征着阳光和希望。"
+    },
+    "天竺葵": {
+        "latin_name": "Pelargonium hortorum",
+        "family": "牻牛儿苗科",
+        "genus": "天竺葵属",
+        "flower_language": "幸福、陪伴、爱情",
+        "basic_intro": "天竺葵是牻牛儿苗科天竺葵属的多年生草本或亚灌木植物，伞形花序，花色丰富。叶片有独特气味。原产南非，是常见的阳台和窗台盆栽花卉，也可用于花坛布置。"
+    },
+    "楼梯草": {
+        "latin_name": "Elatostema involucratum",
+        "family": "荨麻科",
+        "genus": "楼梯草属",
+        "flower_language": "质朴、自然",
+        "basic_intro": "楼梯草是荨麻科楼梯草属的多年生草本植物，喜阴湿环境，常见于林下、沟边。叶片互生，花小而不显眼。分布于中国和日本，是林下地被植物。"
+    },
+    "山桃草": {
+        "latin_name": "Gaura lindheimeri",
+        "family": "柳叶菜科",
+        "genus": "山桃草属",
+        "flower_language": "翩翩起舞、轻盈",
+        "basic_intro": "山桃草是柳叶菜科山桃草属的多年生草本植物，花白色或粉红色，形似小蝴蝶，在微风中摇曳生姿。花期极长，从春到秋开花不断。原产北美，是花境和庭院的优良植物。"
+    },
+    "老鹳草": {
+        "latin_name": "Geranium wilfordii",
+        "family": "牻牛儿苗科",
+        "genus": "老鹳草属",
+        "flower_language": "幸福、温暖",
+        "basic_intro": "老鹳草是牻牛儿苗科老鹳草属的多年生草本植物，花小多为粉紫色，叶片掌状分裂。全草可入药，具有祛风湿、通经络的功效。分布于东亚地区，常见于山坡草地。"
+    },
+    "橙色大丽花": {
+        "latin_name": "Dahlia pinnata",
+        "family": "菊科",
+        "genus": "大丽花属",
+        "flower_language": "热情、大方、感激",
+        "basic_intro": "橙色大丽花是菊科大丽花属的多年生球根花卉，花色橙黄鲜艳，花型多姿多彩。原产墨西哥，是墨西哥国花。大丽花是世界著名观赏花卉，品种繁多，花型花色极其丰富。"
+    },
+    "粉黄大丽花": {
+        "latin_name": "Dahlia pinnata",
+        "family": "菊科",
+        "genus": "大丽花属",
+        "flower_language": "优雅、感激",
+        "basic_intro": "粉黄大丽花是菊科大丽花属的多年生球根花卉，花朵粉黄相间，色调柔和优美。大丽花品种繁多，花型有球型、菊花型、牡丹型等，是世界著名的观赏花卉。"
+    },
+    "穗花姜黄": {
+        "latin_name": "Curcuma petiolata",
+        "family": "姜科",
+        "genus": "姜黄属",
+        "flower_language": "热情、富贵",
+        "basic_intro": "穗花姜黄是姜科姜黄属的多年生草本植物，花序穗状，苞片粉红色或紫色，形似宝塔。原产东南亚热带地区，是热带园林中的特色观赏植物，也可作切花使用。"
+    },
+    "日本银莲花": {
+        "latin_name": "Anemone japonica",
+        "family": "毛茛科",
+        "genus": "银莲花属",
+        "flower_language": "期待、希望",
+        "basic_intro": "日本银莲花是毛茛科银莲花属的多年生草本植物，花大而美丽，有白、粉、红、紫等色，花心黄色。秋季开花，是秋花园中的亮点。原产中国和日本，是优良的观赏花卉。"
+    },
+    "黑心金光菊": {
+        "latin_name": "Rudbeckia hirta",
+        "family": "菊科",
+        "genus": "金光菊属",
+        "flower_language": "公正、正义、灿烂",
+        "basic_intro": "黑心金光菊是菊科金光菊属的一年生或多年生草本植物，舌状花金黄色，管状花深褐色或黑色，形成鲜明的色彩对比。原产北美，是夏季花境和切花的优良材料。"
+    },
+    "银姬小蜡": {
+        "latin_name": "Ligustrum sinense 'Variegatum'",
+        "family": "木犀科",
+        "genus": "女贞属",
+        "flower_language": "纯净、清雅",
+        "basic_intro": "银姬小蜡是木犀科女贞属的常绿灌木或小乔木，叶片边缘银白色或金黄色，花小白色，有芳香。是优良的彩叶观赏植物，常用于绿篱、造型或盆栽观赏。"
+    },
+    "花菱草": {
+        "latin_name": "Eschscholzia californica",
+        "family": "罂粟科",
+        "genus": "花菱草属",
+        "flower_language": "希望、梦想",
+        "basic_intro": "花菱草是罂粟科花菱草属的多年生草本植物，常作一年生栽培。花金黄色至橙黄色，花瓣4枚，杯形，叶片蓝绿色细裂。原产美国加州，是加州的州花，喜阳光充足。"
+    },
+    "蓝目菊": {
+        "latin_name": "Arctotis stoechadifolia",
+        "family": "菊科",
+        "genus": "蓝目菊属",
+        "flower_language": "天真、纯情",
+        "basic_intro": "蓝目菊是菊科蓝目菊属的多年生草本植物，花心有独特的蓝色或紫色金属光泽，周围舌状花白色、粉色或橙色。原产南非，喜阳光充足，是优良的观赏花卉。"
+    },
+    "番红花": {
+        "latin_name": "Crocus chrysanthus",
+        "family": "鸢尾科",
+        "genus": "番红花属",
+        "flower_language": "青春、快乐",
+        "basic_intro": "番红花是鸢尾科番红花属的多年生球根花卉，早春开花，花有紫、白、黄等色。与藏红花同属不同种，观赏价值高。原产欧洲和地中海地区，是早春花坛和岩石园的重要植物。"
+    },
+    "鸢尾": {
+        "latin_name": "Iris tectorum",
+        "family": "鸢尾科",
+        "genus": "鸢尾属",
+        "flower_language": "爱的使者、使命",
+        "basic_intro": "鸢尾是鸢尾科鸢尾属的多年生草本植物，花形似蝴蝶，蓝紫色，有独特的垂瓣和旗瓣。叶片剑形，四季常绿。分布于东亚，是优良的水边和花境植物，根茎可入药。"
+    },
+    "银莲花": {
+        "latin_name": "Anemone cathayensis",
+        "family": "毛茛科",
+        "genus": "银莲花属",
+        "flower_language": "期待、希望、纯洁",
+        "basic_intro": "银莲花是毛茛科银莲花属的多年生草本植物，花白色、粉红色或紫红色，花瓣状萼片5-8枚。喜凉爽湿润环境。分布于中国北方，是美丽的野生花卉。"
+    },
+    "树罂粟": {
+        "latin_name": "Romneya coulteri",
+        "family": "罂粟科",
+        "genus": "树罂粟属",
+        "flower_language": "华丽、高贵",
+        "basic_intro": "树罂粟是罂粟科树罂粟属的多年生草本或亚灌木植物，花大而洁白，花心金黄，花瓣薄如丝绸。原产美国加州和墨西哥，有'加州树罂粟'之称，是独具特色的观赏植物。"
+    },
+    "勋章菊": {
+        "latin_name": "Gazania rigens",
+        "family": "菊科",
+        "genus": "勋章菊属",
+        "flower_language": "光辉、荣耀",
+        "basic_intro": "勋章菊是菊科勋章菊属的多年生草本植物，花形似勋章而得名。舌状花有黄、橙、红、粉等色，基部常有深色斑纹。喜阳光充足，晴天开花，阴天闭合。原产南非。"
+    },
+    "杜鹃花": {
+        "latin_name": "Rhododendron simsii",
+        "family": "杜鹃花科",
+        "genus": "杜鹃花属",
+        "flower_language": "爱的喜悦、奔放",
+        "basic_intro": "杜鹃花是杜鹃花科杜鹃花属的灌木植物，花团锦簇，色彩艳丽，有红、粉、白、紫等色。是中国十大名花之一，有'花中西施'之美誉。喜酸性土壤，分布广泛。"
+    },
+    "睡莲": {
+        "latin_name": "Nymphaea tetragona",
+        "family": "睡莲科",
+        "genus": "睡莲属",
+        "flower_language": "纯洁、宁静、清廉",
+        "basic_intro": "睡莲是睡莲科睡莲属的多年生水生植物，花漂浮或伸出水面，花色有白、粉、红、黄、蓝等。叶片圆形，浮于水面。原产世界各地，是重要的水生观赏植物。"
+    },
+    "玫瑰": {
+        "latin_name": "Rosa rugosa",
+        "family": "蔷薇科",
+        "genus": "蔷薇属",
+        "flower_language": "爱情、美丽、热情",
+        "basic_intro": "玫瑰是蔷薇科蔷薇属的灌木植物，花紫红色或白色，芳香浓郁。 petals 可提取精油，是重要的香料植物。原产中国和日本，是世界著名的观赏花卉，象征爱情。"
+    },
+    "曼陀罗": {
+        "latin_name": "Datura stramonium",
+        "family": "茄科",
+        "genus": "曼陀罗属",
+        "flower_language": "恐怖、敬畏",
+        "basic_intro": "曼陀罗是茄科曼陀罗属的一年生草本植物，花大喇叭形，白色或淡紫色，果实有刺。全株有毒，但具有药用价值，可镇痛止咳。分布广泛，生于村边、路旁。"
+    },
+    "牵牛花": {
+        "latin_name": "Ipomoea nil",
+        "family": "旋花科",
+        "genus": "番薯属",
+        "flower_language": "爱情、平静、虚幻",
+        "basic_intro": "牵牛花是旋花科番薯属的一年生缠绕草本植物，花冠漏斗形，花色有蓝、紫、红、粉、白等。清晨开花，午前凋谢。原产热带美洲，是常见的庭园缠绕花卉。"
+    },
+    "西番莲": {
+        "latin_name": "Passiflora caerulea",
+        "family": "西番莲科",
+        "genus": "西番莲属",
+        "flower_language": "信仰、希望",
+        "basic_intro": "西番莲是西番莲科西番莲属的多年生攀援藤本植物，花形独特，有副花冠和显著的柱头，花色蓝白相间。果实可食用，是著名的百香果原料。原产南美洲。"
+    },
+    "荷花": {
+        "latin_name": "Nelumbo nucifera",
+        "family": "莲科",
+        "genus": "莲属",
+        "flower_language": "纯洁、高尚、清廉",
+        "basic_intro": "荷花是莲科莲属的多年生水生植物，又名莲花、芙蓉。花大而美丽，有粉、白、红等色，清香远溢。全身是宝，藕和莲子可食用。是中国十大名花之一，象征高洁品格。"
+    },
+    "蟾蜍百合": {
+        "latin_name": "Tricyrtis hirta",
+        "family": "百合科",
+        "genus": "油点草属",
+        "flower_language": "神秘、独特",
+        "basic_intro": "蟾蜍百合是百合科油点草属的多年生草本植物，花形奇特，花瓣上有紫色斑点，形似蟾蜍皮肤而得名。花色白至淡紫，秋季开花。原产日本，是阴湿花园的特色植物。"
+    },
+    "红掌": {
+        "latin_name": "Anthurium andraeanum",
+        "family": "天南星科",
+        "genus": "花烛属",
+        "flower_language": "热情、幸福、大展宏图",
+        "basic_intro": "红掌是天南星科花烛属的多年生附生植物，佛焰苞鲜红色，肉穗花序黄色，形似手掌。原产南美洲热带雨林，是高档切花和室内盆栽植物，寓意热情和好运。"
+    },
+    "鸡蛋花": {
+        "latin_name": "Plumeria rubra",
+        "family": "夹竹桃科",
+        "genus": "鸡蛋花属",
+        "flower_language": "希望、新生、孕育",
+        "basic_intro": "鸡蛋花是夹竹桃科鸡蛋花属的灌木或小乔木，花中心鲜黄色，外围白色，似蛋白包裹蛋黄而得名。花香浓郁，是夏威夷的代表性花卉。原产中南美洲，是热带园林的常见植物。"
+    },
+    "铁线莲": {
+        "latin_name": "Clematis florida",
+        "family": "毛茛科",
+        "genus": "铁线莲属",
+        "flower_language": "高洁、美丽的心",
+        "basic_intro": "铁线莲是毛茛科铁线莲属的多年生藤本植物，有'藤本皇后'之美称。花大而艳丽，花色丰富，有白、粉、红、紫、蓝等色。是庭院垂直绿化的上佳选择，品种繁多。"
+    },
+    "木槿": {
+        "latin_name": "Hibiscus syriacus",
+        "family": "锦葵科",
+        "genus": "木槿属",
+        "flower_language": "坚韧、永恒的美丽",
+        "basic_intro": "木槿是锦葵科木槿属的落叶灌木，花大而艳丽，有紫、粉、白等色，花瓣基部常有深色斑。花期极长，夏秋开花不断。是韩国的国花，也是优良的庭园观赏灌木。"
+    },
+    "耧斗菜": {
+        "latin_name": "Aquilegia viridiflora",
+        "family": "毛茛科",
+        "genus": "耧斗菜属",
+        "flower_language": "胜利、坦率",
+        "basic_intro": "耧斗菜是毛茛科耧斗菜属的多年生草本植物，花形独特，花瓣有长距，似鹰爪。花色有蓝、紫、粉、白、黄等。原产北温带地区，是花境和岩石园的重要植物。"
+    },
+    "沙漠玫瑰": {
+        "latin_name": "Adenium obesum",
+        "family": "夹竹桃科",
+        "genus": "沙漠玫瑰属",
+        "flower_language": "坚强、永恒的爱",
+        "basic_intro": "沙漠玫瑰是夹竹桃科沙漠玫瑰属的多肉灌木或小乔木，茎干粗壮膨大，花朵艳丽，有红、粉、白等色，形似小喇叭。原产非洲和阿拉伯半岛的干旱地区，是受欢迎的观赏植物。"
+    },
+    "树锦葵": {
+        "latin_name": "Malvaviscus arboreus",
+        "family": "锦葵科",
+        "genus": "悬铃花属",
+        "flower_language": "温和、体贴",
+        "basic_intro": "树锦葵是锦葵科悬铃花属的常绿灌木，花红色或粉红色，花瓣不展开，形似悬挂的小灯笼。原产墨西哥和南美洲，是热带园林的特色观赏植物，花期几乎全年。"
+    },
+    "木兰": {
+        "latin_name": "Magnolia denudata",
+        "family": "木兰科",
+        "genus": "木兰属",
+        "flower_language": "高尚、纯洁、报恩",
+        "basic_intro": "木兰是木兰科木兰属的落叶乔木，又名玉兰。花大洁白，芳香浓郁，先花后叶，早春满树繁花。是中国传统名花，象征高贵品格。花蕾可入药，有散风寒的功效。"
+    },
+    "仙客来": {
+        "latin_name": "Cyclamen persicum",
+        "family": "报春花科",
+        "genus": "仙客来属",
+        "flower_language": "欢迎、热情、羞怯",
+        "basic_intro": "仙客来是报春花科仙客来属的多年生球根植物，花形独特，花瓣向上翻卷似兔耳。花色有白、粉、红、紫等。原产地中海地区，是冬季室内盆栽的重要花卉。"
+    },
+    "美人蕉": {
+        "latin_name": "Canna indica",
+        "family": "美人蕉科",
+        "genus": "美人蕉属",
+        "flower_language": "热情、坚强、未来",
+        "basic_intro": "美人蕉是美人蕉科美人蕉属的多年生草本植物，花大色艳，有红、黄、橙等色。叶片宽大，叶色有绿、紫红等。原产热带美洲，是园林中常见的花坛和水边植物。"
+    },
+    "朱顶红": {
+        "latin_name": "Hippeastrum vittatum",
+        "family": "石蒜科",
+        "genus": "朱顶红属",
+        "flower_language": "渴望、荣誉、骄傲",
+        "basic_intro": "朱顶红是石蒜科朱顶红属的多年生球根植物，花茎中空，顶端开花2-4朵，花大如百合，花色有红、粉、白、橙等。原产中南美洲，是重要的室内和庭院球根花卉。"
+    },
+    "美国薄荷": {
+        "latin_name": "Monarda didyma",
+        "family": "唇形科",
+        "genus": "美国薄荷属",
+        "flower_language": "清爽、舒适",
+        "basic_intro": "美国薄荷是唇形科美国薄荷属的多年生草本植物，花冠红色、粉红色或紫色，轮伞花序顶生，花形独特。叶片有薄荷香气，可泡茶。原产北美，是优良的香草和观赏植物。"
+    },
+    "球兰": {
+        "latin_name": "Hoya carnosa",
+        "family": "夹竹桃科",
+        "genus": "球兰属",
+        "flower_language": "青春、美丽、纯洁",
+        "basic_intro": "球兰是夹竹桃科球兰属的多年生藤本植物，伞形花序呈半球形，花肉质，白色或粉红色，中心紫红色，有蜡质光泽，芳香浓郁。原产东亚和澳大利亚，是受欢迎的室内观花植物。"
+    },
+    "毛地黄": {
+        "latin_name": "Digitalis purpurea",
+        "family": "车前科",
+        "genus": "毛地黄属",
+        "flower_language": "不诚实、隐瞒",
+        "basic_intro": "毛地黄是车前科毛地黄属的二年生或多年生草本植物，花序高耸，花冠钟形，紫红色，内部有斑点。是重要的药用植物，可提取强心苷。原产欧洲，是花境中的竖向线条植物。"
+    },
+    "三角梅": {
+        "latin_name": "Bougainvillea spectabilis",
+        "family": "紫茉莉科",
+        "genus": "叶子花属",
+        "flower_language": "热情、坚韧不拔",
+        "basic_intro": "三角梅是紫茉莉科叶子花属的藤本灌木，苞片三角形，色彩鲜艳，有红、粉、紫、白、橙等色。真正的花小而白色。原产南美洲，是南方园林中常见的观赏植物。"
+    },
+    "山茶花": {
+        "latin_name": "Camellia japonica",
+        "family": "山茶科",
+        "genus": "山茶属",
+        "flower_language": "谦逊、理想的爱",
+        "basic_intro": "山茶花是山茶科山茶属的常绿灌木或小乔木，花大色艳，红、粉、白等色，花瓣多层。是中国传统名花，有'花中妃子'之称。喜温暖湿润的半阴环境。种子可榨油。"
+    },
+    "锦葵": {
+        "latin_name": "Malva sinensis",
+        "family": "锦葵科",
+        "genus": "锦葵属",
+        "flower_language": "温暖、恩惠",
+        "basic_intro": "锦葵是锦葵科锦葵属的二年生或多年生草本植物，花紫红色或粉红色，花瓣5枚，有深色脉纹。叶圆心形。原产欧亚温带地区，是古老的花园植物，也可入药。"
+    },
+    "宿根亚麻": {
+        "latin_name": "Linum perenne",
+        "family": "亚麻科",
+        "genus": "亚麻属",
+        "flower_language": "纯洁、简洁",
+        "basic_intro": "宿根亚麻是亚麻科亚麻属的多年生草本植物，花蓝色或白色，5瓣，轻盈优雅。花期夏季，成片开放时如蓝色云雾。原产欧洲，是花境和岩石园的良好材料。"
+    },
+    "观赏凤梨": {
+        "latin_name": "Guzmania lingulata",
+        "family": "凤梨科",
+        "genus": "果子蔓属",
+        "flower_language": "完美、吉祥",
+        "basic_intro": "观赏凤梨是凤梨科果子蔓属的多年生附生植物，叶片带状，丛生呈莲座状，中心花序苞片鲜红、橙红或黄色，花期持久。原产中南美洲热带雨林，是受欢迎的室内观赏植物。"
+    },
+    "天人菊": {
+        "latin_name": "Gaillardia pulchella",
+        "family": "菊科",
+        "genus": "天人菊属",
+        "flower_language": "团结、同心协力",
+        "basic_intro": "天人菊是菊科天人菊属的一年生或多年生草本植物，头状花序，舌状花红黄色，管状花紫褐色。耐旱耐热，花期夏季至秋季。原产北美，是花境和野花组合的优良材料。"
+    },
+    "凌霄花": {
+        "latin_name": "Campsis grandiflora",
+        "family": "紫葳科",
+        "genus": "凌霄属",
+        "flower_language": "骄傲、执着",
+        "basic_intro": "凌霄花是紫葳科凌霄属的落叶藤本植物，花冠漏斗形，橙红色，鲜艳夺目。以气生根攀援，夏季开花。是中国传统园林植物，常植于墙边、架下。花和根可入药。"
+    },
+    "黑百合": {
+        "latin_name": "Fritillaria camtschatcensis",
+        "family": "百合科",
+        "genus": "贝母属",
+        "flower_language": "神秘、高贵",
+        "basic_intro": "黑百合是百合科贝母属的多年生草本植物，花紫黑色至暗褐色，钟形下垂，神秘而高贵。分布于北半球寒温带的高山地区，是珍稀的高山植物。"
+    },
+    "白百合": {
+        "latin_name": "Lilium candidum",
+        "family": "百合科",
+        "genus": "百合属",
+        "flower_language": "纯洁、庄严、百年好合",
+        "basic_intro": "白百合是百合科百合属的多年生球根植物，花大洁白，芳香浓郁，花瓣开展。是纯洁和高贵的象征，在西方文化中常与圣母玛利亚关联。原产地中海地区，是重要的切花和观赏花卉。"
+    }
+}
+
+def main():
+    with open(CAT_TO_NAME_PATH, "r", encoding="utf-8") as f:
+        cat_to_name = json.load(f)
+
+    all_names = set(cat_to_name.values())
+    flower_info = {}
+
+    for name in all_names:
+        if name in known_info:
+            flower_info[name] = known_info[name]
+        else:
+            flower_info[name] = {
+                "latin_name": "",
+                "family": "",
+                "genus": "",
+                "flower_language": "",
+                "basic_intro": f"{name}，一种美丽的观赏植物"
+            }
+
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(flower_info, f, ensure_ascii=False, indent=2)
+
+    total = len(all_names)
+    filled = sum(1 for v in flower_info.values() if v.get("basic_intro") and v.get("family"))
+    print(f"完成！共 {total} 种花卉，其中 {filled} 种有完整信息")
+    print(f"数据已保存至: {OUTPUT_PATH}")
+
+if __name__ == "__main__":
+    main()
